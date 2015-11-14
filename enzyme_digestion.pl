@@ -7,7 +7,8 @@ use Getopt::Std;
 
 my $missed_cleavages = (defined $opt_c) ? $opt_c : 0;         #Setting missed cleavages to a default value of 0     
 my (@proteins, @sequences, @peptides);                        #Declaring arrays and variables
-my ($protein, $sequence, $peptide);
+my ($protein, $sequence, $peptide,$unusual_counter,$unknown_counter);
+
 ############################################################################
 ##############           Main subroutine                          ##########
 ############################################################################
@@ -26,8 +27,9 @@ sub main
 	{ 
                 while $protein
 			{
-			if (
-			}
+			if (=~ m/(BOUJZ)/g) {$unusual_counter++;}
+			if (=~ m/X/g) {$unknown_counter++;}
+ 			}
 		if ($protein !~ /^>/)   
 		{         
 			$protein =~ s/\s//g;                
@@ -35,7 +37,7 @@ sub main
 
                 }
 #        print "holacaracola";
-	}  
+	} 
 	foreach $sequence (@sequences)                             #Checks user input and goes to the specified enzyme subroutine for 
 	{                                                          # every sequence(Protein)
 	if ($opt_t) {@peptides = trypsine(\$sequence);}
@@ -139,5 +141,5 @@ exit;
 
 sub print_peptides
 {
-print "@peptides";
+print "@peptides @mc_peptides @unusual_counter @unknown_counter";
 }
