@@ -8,9 +8,16 @@ use strict;
 use diagnostics;
 
 #Defining user options
-use vars qw($opt_t $opt_l $opt_a $opt_v $opt_c $opt_h);       
-use Getopt::Std;
-
+# If there is no user input, error message and usage are displayed and program closes
+use Getopt::Long;
+if (!GetOptions ("trypsine=s" => \$opt_t,
+	    "lys-c=s" => \$opt_l,
+	    "arg-c=s" => \$opt_a,
+	    "glu-c=s" => \$opt_v,
+	    "missed-cleavages=i" => $opt_c,
+	    "help=s" => \$opt_h )) {
+	    	error_out("No arguments recognized");
+	    }
 #Setting missed cleavages to a default value of 0   
 my $n_missed_cleavages = (defined $opt_c) ? $opt_c : 0;    
 
@@ -24,10 +31,6 @@ my ($n,$r,$s,$i,$j);
 @proteins=("DAAAAATTLTTTAMTTTTTTCKMMFRPPPPPGGGGGGGGGGGG","ALTAMCMNVWEITYHKGSDVNRRASFAQPPPQPPPPLLAIKPASDASD");
 main();
 sub main {    
-	# If there is no user input, error message and usage are displayed and program closes
-	if (!getopts ('tlavc:h')) {
-		error_out("No arguments recognized");
-	}
 	if ($opt_h) {
 		help();
 		exit;
@@ -126,13 +129,7 @@ sub help {
 
 sub error_out {
 	my $error_msg = shift;
-	print "USAGE:$0\n";
-	print "\t[-t]: digests protein with trypsin\n";
-	print "\t[-l]: digests protein with endoproteinase Lys-C\n";
-	print "\t[-a]: digests protein with endoproteinase Arg-C\n";
-	print "\t[-v]: digests protein with V8 proteinase\n";
-	print "\t[-c]: number of allowed missed cleavages. Default value is 0.\n";
-	print "\t[-h]: prints help\n\n";
+	help;
 	die "$error_msg";
 }
 
