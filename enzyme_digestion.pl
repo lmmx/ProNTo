@@ -137,17 +137,17 @@ sub error_out {
 }
 
 sub print_peptides {
-print "$unusual_counter unusual aminoacids (BOUJZ) were found, $unknown_counter unknown aminoacids (X) were found.";
-foreach ( $i, $i<$protein_size, $i++){
-	foreach ( $j, $j<$peptide_size, $j++){
-		print "Protein[$i]   Peptide[$j]  No cleavages\n";
-		print " @peptides[$j]\n";
-	}
-foreach ( $r, $r<$protein_size, $r++){
-	foreach ( $s, $s<$mc_peptide_size, $s++){
-		print "Protein[$r]   Peptide[$s]  $n cleavages\n";
-		print " @mc_peptides[$s]\n";
-	}
+print "$unusual_counter unusual aminoacids (BOUJZ) were found, $unknown_counter unknown aminoacids (X) were found";
+foreach ( $i=1, $i<$protein_size, $i++){
+        foreach ( $j=1, $j<$peptide_size, $j++){
+                print "Protein[$i] Peptide[$j] No cleavages\n";
+                print " $peptides[$j]\n";
+        }
+foreach ( $r=1, $r<$protein_size, $r++){
+        foreach ( $s=1, $s<$mc_peptide_size, $s++){
+                print "Protein[$r] Peptide[$s] $n cleavages\n";
+                print " $mc_peptides[$s]\n";
+        }
 }
 return;
 }
