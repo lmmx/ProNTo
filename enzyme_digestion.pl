@@ -6,10 +6,16 @@
 use warnings;
 use strict;
 use diagnostics;
+use Getopt::Long;
 
 #Defining user options
 # If there is no user input, error message and usage are displayed and program closes
-use Getopt::Long;
+
+my ($trypsin, $lysc, $argc, $gluc, $help_opt );
+
+#Setting missed cleavages to a default value of 0   
+my $n_missed_cleavages = 0;
+
 if (!GetOptions ("trypsin=s" => \$trypsin,
 	    "lys-c=s" => \$lysc,
 	    "arg-c=s" => \$argc,
@@ -18,8 +24,7 @@ if (!GetOptions ("trypsin=s" => \$trypsin,
 	    "help=s" => \$help_opt )) {
 	    	error_out("No arguments recognized");
 	    }
-#Setting missed cleavages to a default value of 0   
-my $n_missed_cleavages = (defined $n_missed_cleavages) ? $n_missed_cleavages : 0;    
+
 
 #Declaring arrays and variables
 my (@sequences, @peptides, @mc_peptides);                       
