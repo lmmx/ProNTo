@@ -1,14 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 package ProNTo::enzymeDigestion;
 
-######################################################################################
-## enzyme_digestion.pl
-#######################################################################################
-
-use warnings;
 use strict;
 use diagnostics;
+use warnings;
 use Getopt::Long;
 
 # Defining user options.
@@ -167,3 +163,13 @@ for ( $r=1, $r<$protein_size, $r++){
 return;
 }
 main();
+
+# End of module evaluates to true
+
+1;
+
+__END__
+
+# End of file evaluates to false
+
+0;
