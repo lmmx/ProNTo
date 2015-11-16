@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Spec; # for class methods related to file path parsing
+use File::Basename; # for dirname function
+
+__PACKAGE__->main(@ARGV) unless caller;
+# when executed the main subroutine will run by default, using the command line args in @ARGV
+# further details: http://stackoverflow.com/q/1215657/2668831
+
+# declare these to be assigned in the BEGIN block
+my ($absbin, $libdirname);
+
+BEGIN {
+    # __FILE__ provides a relative path to the bin file
+    # According to http://stackoverflow.com/a/90721/2668831 this is the most robust method
+    $absbin = File::Spec->rel2abs(__FILE__);
+    # use dirname x2 to go "up" 2 directories from bin file, then descend into the lib path:
+    $libdirname = File::Spec->catfile(dirname(dirname($absbin)),"lib");
+};
+print "Using lib $libdirname\n";
+
+use lib $libdirname;
+
+sub enzDigest {
+  #  use ProNTo::EnzymeDigestion ();
+}
+
+sub ORFpredict {
+ 
+   use ProNTo::ORFprediction ();
+}
+
+sub ionStat {
+    use ProNTo::IonStats ();
+}
+
+sub main {
+    my $class = shift;
+    my $obj   = $class->new(@ARGV);
+    print $obj->to_string, "\n";
+   enzDigest;
+   ORFpredict;
+   ionStat;
+}
+
+sub new {
+    my $class = shift;
+    return bless [@_], $class;
+}
+
+sub to_string {
+    my $self = shift;
+    return "handle these args: " . join " ", map { "$_" } @$self;
+}
+
+__END__

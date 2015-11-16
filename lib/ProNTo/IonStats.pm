@@ -1,28 +1,46 @@
-#!/usr/bin/perl 
+#!/usr/bin/env perl
 
-use diagnostics;
+package ProNTo::IonStats;
+
 use strict;
 use warnings;
 use Getopt::Long;
 
-# Defining bin size and parameters
+use Exporter;
+our @ISA = qw(Exporter);
 
-my $data =  "table.tsv";
-my $AAfilterContains = "None";
-my $AAfilterTerm = "None";
-my $binmax = <>;
-my $binmin = <>;
-my $binsize = <>;
-my @sorted;
+# #################################
+# TBC : which variables to export ?
+# #################################
+our @EXPORT_OK = qw();
 
-handleopts();
+# Initialising variables in scope, then assign some of them
+
+my ($binwidth,
+    $binvalue,
+    $data,
+    $AAfilterContains,
+    $AAfilterTerm);
+BEGIN {
+        $data =  "mztable.tsv";
+        $AAfilterContains = "None";
+        $AAfilterTerm = "None";
+};
+
+__PACKAGE__->main(@ARGV) unless caller;
+
+sub main {
+        handleopts();
+        reader();
+        print "\n\nAll done\n";
+}
 
 sub handleopts {
+        # Defining bin size and parameters
         if (!GetOptions (
-                "bin-width=i" => \$binmax,
+                "bin-width=i" => \$binwidth,
                 "file=s" => \$data,
-                "bin-value=i" => \$binmin,
-                "bin-size=i" => \$binsize,
+                "bin-value=i" => \$binvalue,
                 "aa-filter-contains=s" => \$AAfilterContains,
                 "aa-filter-term=s" => \$AAfilterTerm)){
                 print STDERR "Error, failed to obtain information from user\n";
@@ -31,15 +49,19 @@ sub handleopts {
         }
 }
 
-open(IFILE, $data) or die "Error, could not open input file\n";
+sub reader {
+        open(IFILE, "../../data/$data") or die "Error, could not open input file\n";
 
-# READING THE DATA
-
-my @lines = <IFILE>;
-my @MZvalues;
-foreach my $line (@lines) {
-        my $MZvalue = processMzValue($line, $AAfilterContains, $AAfilterTerm);
+        # READING THE DATA
+        
+        my @lines = <IFILE>;
+        my @MZvalues;
+        foreach my $line (@lines) {
+                my $MZvalue = processMzValue($line, $AAfilterContains, $AAfilterTerm);
+                push @MZvalues, $MZvalue;
+        }
 }
+
 sub processMzValue {
         # take the first parameter to the subroutine as a scalar variable, called line
         my $line = shift;
@@ -47,7 +69,7 @@ sub processMzValue {
         my $AAfilterTerm = shift;
         if ($AAfilterContains ne "None") {processAA($AAfilterContains);}
         if ($AAfilterTerm ne "None") {
-                
+
                 # Specify the terminus and residues in the format:
                 #       --aa-filter-term N:RKH
                 # to indicate N-terminal R, K, or H residues
@@ -72,9 +94,8 @@ sub processMzValue {
         if ( $mzcol =~ /(\d+)/ ) {
                 my $mzcolmatch = $1;
                 # capture m/z value for the current row in table
-               
+
                 print "$mzcolmatch\n" or die "Nope";
-                push @MZvalues, $mzcolmatch;
         }
 }
 
@@ -82,11 +103,12 @@ sub processAA {
         # Filter for amino acid composition/terminal residue to generate stats
 }
 
+# End of module evaluates to true
 
-# Take values in @MZvalues and puts them into bins
+1;
 
-@sorted = sort (@MZvalues);
-print "\n@sorted\n";
+__END__
 
-print "\nAll done\n";
-exit;
+# End of file evaluates to false
+
+0;
