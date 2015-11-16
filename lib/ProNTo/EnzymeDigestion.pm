@@ -21,7 +21,7 @@ if (!GetOptions ("trypsin" => \$trypsin,
 	    "glu-c" => \$gluc,
 	    "missed-cleavages=i" => $n_missed_cleavages,
 	    "help" => \$help_opt )) {
-	    	error_out("No arguments recognized");
+	    	&error_out("No arguments recognized");
 	    }
 
 
@@ -56,19 +56,19 @@ sub main {
 	} 
 	# Goes to the subroutine for digestion of the proteins and returns and array of peptides
 	# obtained from the digestion.
-	@peptides=digestion(\@sequences);
+	@peptides=&digestion(\@sequences);
 	# If user selects a number of missed cleavages, goes to subroutine and returns an
 	# array with new peptides formed with $n misscleavages, where $n goes from 1 to the 
 	# max allowed cleavages. I.e: if $n_missed_cleavages=3, should return array of peptides
 	# with $n=1,2 and 3 misscleavages.
-	if ($n_missed_cleavages > 0) {@mc_peptides=missed_cleavages(\@peptides);}  
+	if ($n_missed_cleavages > 0) {@mc_peptides=&missed_cleavages(\@peptides);}  
 	# Getting the lenght of the arrays containing the proteins, the peptides and the 
 	# misscleavage peptides in order to use them in the subroutine to print results.	
 	$protein_size=scalar(@sequences);
 	$peptide_size=scalar(@peptides);
 	$mc_peptide_size=scalar(@mc_peptides);
 	# Goes to subroutine for printing the peptides obtained in the digestion.			
-	print_peptides();     
+	&print_peptides();     
 	# Exits the program.
 	exit;
 }
@@ -108,7 +108,7 @@ sub digestion {
 		}
 		else {
 			# If no enzymes are selected, error message and usage are printed on the screen
-			error_out("No enzyme selected");                           
+			&error_out("No enzyme selected");                           
 		}
 	}
 	# Returns array of digested peptides to main subroutine.
@@ -147,21 +147,22 @@ sub error_out {
 }
 
 sub print_peptides {
-print "$unusual_counter unusual aminoacids (BOUJZ) were found, $unknown_counter unknown aminoacids (X) were found";
-for ( $i=1, $i<$protein_size, $i++){
-        for ( $j=1, $j<$peptide_size, $j++){
-                print "Protein[$i] Peptide[$j] No cleavages\n";
-                print " $peptides[$j]\n";
-        }
+	print "$unusual_counter unusual aminoacids (BOUJZ) were found, $unknown_counter unknown aminoacids (X) were found";
+	for ( $i=1, $i<$protein_size, $i++){
+			for ( $j=1, $j<$peptide_size, $j++){
+					print "Protein[$i] Peptide[$j] No cleavages\n";
+					print " $peptides[$j]\n";
+			}
+	}
+	for ( $r=1, $r<$protein_size, $r++){
+			for ( $s=1, $s<$mc_peptide_size, $s++){
+					print "Protein[$r] Peptide[$s] $n cleavages\n";
+					print " $mc_peptides[$s]\n";
+			}
+	}
+	return;
 }
-for ( $r=1, $r<$protein_size, $r++){
-        for ( $s=1, $s<$mc_peptide_size, $s++){
-                print "Protein[$r] Peptide[$s] $n cleavages\n";
-                print " $mc_peptides[$s]\n";
-        }
-}
-return;
-}
+
 main();
 
 # End of module evaluates to true
