@@ -27,8 +27,7 @@ sub enzDigest {
   #  use ProNTo::EnzymeDigestion ();
 }
 
-sub ORFpredict {
- 
+sub ORFpredict { 
    use ProNTo::ORFprediction ();
 }
 

@@ -54,9 +54,9 @@ The queue for bugs & enhancements in ProNTo.
 
 # # # # # # # # # # # # # # # # # #
 # Define project-wide subroutines #
-# . . .                           #
-#       . . .                     #
-#             . . .               #
+#      . . .                      #
+#            . . .                #
+#                 . . .           #
 # # # # # # # # # # # # # # # # # #
 
 sub exampleSubRoutine {

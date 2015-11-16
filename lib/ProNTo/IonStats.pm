@@ -2,6 +2,7 @@
 
 package ProNTo::IonStats;
 
+use diagnostics;
 use strict;
 use warnings;
 use Getopt::Long;
@@ -17,35 +18,43 @@ our @EXPORT_OK = qw();
 # Initialising variables in scope, then assign some of them
 
 my ($binwidth,
-    $binvalue,
+    $massmin,
+    $massmax,
     $data,
     $AAfilterContains,
-    $AAfilterTerm);
+    $AAfilterTerm,
+    @sortedmzvals
+    );
+
 BEGIN {
         $data =  "mztable.tsv";
         $AAfilterContains = "None";
         $AAfilterTerm = "None";
+        $binwidth = 10;
+        $massmin = 1000;
+        $massmax = 1500;
 };
 
 __PACKAGE__->main(@ARGV) unless caller;
 
 sub main {
         handleopts();
+        print "Bin width is $binwidth m/z; range is $massmin to $massmax m/z units.\n";
         reader();
-        print "\n\nAll done\n";
+        print "\nAll done\n";
 }
 
 sub handleopts {
         # Defining bin size and parameters
         if (!GetOptions (
-                "bin-width=i" => \$binwidth,
+                "bin-width=f" => \$binwidth,
                 "file=s" => \$data,
-                "bin-value=i" => \$binvalue,
+                "bin-min=f" => \$massmin,
+                "bin-max=f" => \$massmax,
                 "aa-filter-contains=s" => \$AAfilterContains,
                 "aa-filter-term=s" => \$AAfilterTerm)){
-                print STDERR "Error, failed to obtain information from user\n";
-                print "Help_page\n";
-                exit(0);
+                print "Help_page\n"; # to be replaced by generic help subroutine
+                die "Error, failed to obtain information from user\n";
         }
 }
 
@@ -87,20 +96,26 @@ sub processMzValue {
         next if ($line =~ /^$/);
         # this error-proofs the read so that at every loop it will ignore the spaces
 
-        my @column = split( /\t|\n/, $line );
-        # splits the column
+        my @columns = split( /\t|\n/, $line );
+        # splits the row into columns
 
-        my $mzcol = $column[2];
+        my $mzcol = $columns[2];
         if ( $mzcol =~ /(\d+)/ ) {
                 my $mzcolmatch = $1;
                 # capture m/z value for the current row in table
-
-                print "$mzcolmatch\n" or die "Nope";
+                print "$mzcolmatch\n";
         }
 }
 
 sub processAA {
         # Filter for amino acid composition/terminal residue to generate stats
+}
+
+sub generateBins {
+        my @MZvalues = shift;
+        my @sortedMZvalues = sort @MZvalues;
+        print "\n@sortedMZvalues\n";
+        return;
 }
 
 # End of module evaluates to true
