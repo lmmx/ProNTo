@@ -1,6 +1,9 @@
 #!/usr/bin/env perl
 
 package ProNTo::enzymeDigestion;
+######################################################################################
+## enzyme_digestion.pl
+#######################################################################################
 
 use strict;
 use diagnostics;
@@ -21,7 +24,7 @@ if (!GetOptions ("trypsin" => \$trypsin,
 	    "glu-c" => \$gluc,
 	    "missed-cleavages=i" => $n_missed_cleavages,
 	    "help" => \$help_opt )) {
-	    	&error_out("No arguments recognized");
+	    	error_out("No arguments recognized");
 	    }
 
 
@@ -53,22 +56,23 @@ sub main {
 			# Saving protein sequences into a new array.
                         push @sequences, $protein;
         	}
+#		print "$unusual_counter unusual aminoacids (BOUJZ) were found, $unknown_counter unknown aminoacids (X) were found\n";
 	} 
 	# Goes to the subroutine for digestion of the proteins and returns and array of peptides
 	# obtained from the digestion.
-	@peptides=&digestion(\@sequences);
+	@peptides=digestion(\@sequences);
 	# If user selects a number of missed cleavages, goes to subroutine and returns an
 	# array with new peptides formed with $n misscleavages, where $n goes from 1 to the 
 	# max allowed cleavages. I.e: if $n_missed_cleavages=3, should return array of peptides
 	# with $n=1,2 and 3 misscleavages.
-	if ($n_missed_cleavages > 0) {@mc_peptides=&missed_cleavages(\@peptides);}  
+	if ($n_missed_cleavages > 0) {@mc_peptides=missed_cleavages(\@peptides);}  
 	# Getting the lenght of the arrays containing the proteins, the peptides and the 
 	# misscleavage peptides in order to use them in the subroutine to print results.	
 	$protein_size=scalar(@sequences);
 	$peptide_size=scalar(@peptides);
 	$mc_peptide_size=scalar(@mc_peptides);
 	# Goes to subroutine for printing the peptides obtained in the digestion.			
-	&print_peptides();     
+	print_peptides(\@sequences,\@peptides,\@mc_peptides,\$n);     
 	# Exits the program.
 	exit;
 }
@@ -108,7 +112,7 @@ sub digestion {
 		}
 		else {
 			# If no enzymes are selected, error message and usage are printed on the screen
-			&error_out("No enzyme selected");                           
+			error_out("No enzyme selected");                           
 		}
 	}
 	# Returns array of digested peptides to main subroutine.
@@ -125,6 +129,7 @@ sub missed_cleavages {
 		}
 	}
 return @mc_peptides;
+return $n;
 }
 
 sub help {
@@ -147,20 +152,37 @@ sub error_out {
 }
 
 sub print_peptides {
-	print "$unusual_counter unusual aminoacids (BOUJZ) were found, $unknown_counter unknown aminoacids (X) were found";
-	for ( $i=1, $i<$protein_size, $i++){
-			for ( $j=1, $j<$peptide_size, $j++){
-					print "Protein[$i] Peptide[$j] No cleavages\n";
-					print " $peptides[$j]\n";
-			}
-	}
-	for ( $r=1, $r<$protein_size, $r++){
-			for ( $s=1, $s<$mc_peptide_size, $s++){
-					print "Protein[$r] Peptide[$s] $n cleavages\n";
-					print " $mc_peptides[$s]\n";
-			}
+        # Usage:
+        #       parameter 1 is array of proteins (i.e. the sequences)
+        #       param 2 is the array of peptides generated from digestion of the proteins
+	#	param 3 is the array of additional peptides generated from missing the cleavages
+        #       param 4 is the number of allowed misscleavages
+
+	my $sequence_ref = shift;
+        my $peptide_ref = shift;
+        my $mc_peptide_ref = shift;
+        my $n_ref= shift;
+	my @sequences_ref = @{$sequence_ref};
+	my @peptides_ref = @{$peptide_ref};
+	my @mc_peptides_ref = @{$mc_peptide_ref};
+
+	my $n_proteins = scalar @sequences_ref;
+	print "Processing $n_proteins proteins\n";
+
+	for my $i (0..$#sequences_ref) {
+		my $printed_i = $i+1;
+		print "Protein: $printed_i\n";
+    		my $sequence_ref = $sequences_ref[$i];
+    		my $j;
+    		print scalar @peptides_ref . " peptides for protein $printed_i\n";
+    			for my $j (0..$#peptides_ref) {
+        			my $printed_j = $j+1;
+        			print "> Protein: $printed_i|Peptide:$printed_j| $n_ref cleavages\n";
+        			print "$peptides_ref[$j]\n";
+    			}
 	}
 	return;
+    
 }
 
 main();
