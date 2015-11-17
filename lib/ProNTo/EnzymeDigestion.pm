@@ -6,7 +6,7 @@ package ProNTo::enzymeDigestion;
 #######################################################################################
 
 use strict;
-use diagnostics;
+#use diagnostics;
 use warnings;
 use Getopt::Long;
 
@@ -29,8 +29,8 @@ if (!GetOptions ("trypsin" => \$trypsin,
 
 
 # Declaring arrays and variables used.
-my (@sequences, @peptides, @mc_peptides);                       
-my ($protein, $sequence, $peptide, $unusual_counter,$unknown_counter, $protein_size, $peptide_size, $mc_peptide_size);
+my (@sequences, @peptides, @mc_peptides, @sequences_ref);                       
+my ($protein, $sequence, $peptide, $unusual_counter,$unknown_counter, $protein_size, $peptide_size, $mc_peptide_size, $peptides_ref);
 my ($n,$r,$s,$i,$j);
 
 # Array of proteins for testing the program, should be silenced with a hash when using the proteins from task 1.
@@ -120,28 +120,43 @@ sub digestion {
 }
 
 sub missed_cleavages {
-	my $peptides_ref= shift;
+	my $peptide_ref= shift;
+	my $sequence_ref=shift;
 	my @peptides_ref={@$peptides_ref};
-	for $n(1...$n_missed_cleavages){
-		my $counter = 0;
-		for $counter($counter<scalar(@peptides)-$n,$counter++){
-			my @mc_peptides = join ('',@peptides[$counter...$counter+$n]);
+	my @sequences_ref={@sequences_ref};
+	my @n_cleav = (1...$n_missed_cleavages);
+
+	for my $n (@n_cleav) {
+		for my $seq (0...@sequences_ref) {
+			for my $pep (0...@peptides_ref-1) {
+				my $end_pep = $pep + $n;
+				my $mc_pep;
+				if ($end_pep>=@peptides_ref) {
+					last;
+				}
+				for my $pos ($pep...$end_pep) {
+					$mc_pep = $mc_pep.$peptides[$pos];
+				}
+			push @mc_peptides, $mc_pep;
+			}
 		}
 	}
-return @mc_peptides;
-return $n;
+	print "This are my mc_peps @mc_peptides\n";
+	return @mc_peptides;
+	return @n_cleav;
 }
+
 
 sub help {
 	print "\n\n Protein Digestion Options\n";
 	print "========================================\n\n";
 	print "Options:\n";
-	print "[-t]: digests protein with trypsin\n";
-	print "[-l]: digests protein with endoproteinase Lys-C\n";
-	print "[-a]: digests protein with endoproteinase Arg-C\n";
-	print "[-v]: digests protein with V8 proteinase\n";
-	print "[-c]: number of allowed missed cleavages. Default value is 0.\n";
-	print "[-h]: prints help\n\n";
+	print "[--trypsin]: digests protein with trypsin\n";
+	print "[--lys-c]: digests protein with endoproteinase Lys-C\n";
+	print "[--arg-c]: digests protein with endoproteinase Arg-C\n";
+	print "[--glu-c]: digests protein with V8 proteinase\n";
+	print "[--missed-cleavages]: number of allowed missed cleavages. Default value is 0.\n";
+	print "[--help]: prints help\n\n";
 	return;
 }
 
@@ -177,7 +192,7 @@ sub print_peptides {
     		print scalar @peptides_ref . " peptides for protein $printed_i\n";
     			for my $j (0..$#peptides_ref) {
         			my $printed_j = $j+1;
-        			print "> Protein: $printed_i|Peptide:$printed_j| $n_ref cleavages\n";
+        			print "> Protein: $printed_i|Peptide:$printed_j| No cleavages\n";
         			print "$peptides_ref[$j]\n";
     			}
 	}
