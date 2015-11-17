@@ -23,6 +23,7 @@ my ($binwidth,
     $data,
     $AAfilterContains,
     $AAfilterTerm,
+    @mzdata,
     @sortedmzvals,
     $usage
     );
@@ -41,7 +42,7 @@ __PACKAGE__->main(@ARGV) unless caller;
 sub main {
         handleopts();
         print "Bin width is $binwidth m/z; range is $massmin to $massmax m/z units.\n";
-        reader();
+        @mzdata = reader();
         print "\nAll done\n";
 }
 
@@ -68,31 +69,34 @@ sub reader {
         my @lines = <IFILE>;
         my @MZvalues;
         foreach my $line (@lines) {
-                my $MZvalue = processMzValue($line, $AAfilterContains, $AAfilterTerm);
+                my $MZvalue = LineToMZ($line, $AAfilterContains, $AAfilterTerm);
                 push @MZvalues, $MZvalue;
         }
 }
 
-sub processMzValue {
+sub LineToMZ {
         # take the first parameter to the subroutine as a scalar variable, called line
         my $line = shift;
         my $AAfilterContains = shift;
         my $AAfilterTerm = shift;
-        if ($AAfilterContains ne "None") {processAA($AAfilterContains);}
+        if ($AAfilterContains ne "None") {
+                # check if contains, or doesn't contain, a given set of residues
+                processAA($line, $AAfilterContains);
+        }
         if ($AAfilterTerm ne "None") {
-
                 # Specify the terminus and residues in the format:
-                #       --aa-filter-term N:RKH
-                # to indicate N-terminal R, K, or H residues
+                #       --aa-filter-term N:M
+                # to indicate an N-terminal Met residue
                 # or
                 #       --aa-filter-term C:WQD
                 # to indicate C-terminal W, Q, or D residues
-                my $terminus =~ /(^.):(.+)/;
+                $AAfilterTerm =~ /(^.):(.+)/;
                 # The above regular expression has 2 match groups:
                 #       $1 is the terminus (C or N)
                 #       $2 is one or more residues
-
-                processAA($2, $1);
+                my $terminus = $1;
+                my $term_residues = $2;
+                processAA($line, $term_residues, $terminus);
         }
 
         next if ($line =~ /^$/);
@@ -110,7 +114,26 @@ sub processMzValue {
 }
 
 sub processAA {
-        # Filter for amino acid composition/terminal residue to generate stats
+        my $line = shift;
+        my $num_params = scalar @_;
+        if ($num_params == 2) {
+                # using $line and $AAfilterContains
+                $AAfilterContains = shift;
+        } elsif ($num_params == 3){
+                
+        } elsif ($num_params == 5) {
+                
+        } else {
+                die "Incorrect number of parameters passed to processAA";
+        }
+        next if ($line =~ /^$/);
+        my @AAcolumn = split( /\t|\n/, $line );
+        my $AAfilcolumn = $AAcolumn[2];
+        if ( $AAfilcolumn =~ /$AAfilterContains/) {
+                my $mz = $AAcolumn[3];
+                my $AAmatch = $1;
+                print "Here's one\n";
+        }
 }
 
 sub generateBins {
@@ -118,6 +141,12 @@ sub generateBins {
         my @sortedMZvalues = sort @MZvalues;
         print "\n@sortedMZvalues\n";
         return;
+
+        my $bin_number = ($massmax - $massmin)/$binwidth;
+        my $bin = int ($MZ - $massmin)/$binwidth;
+        foreach $MZ (@MZvalues) {
+                if ($MZ > $massmin and $MZ <= $massmax and $MZ <= $bin)
+        }
 }
 
 # End of module evaluates to true
