@@ -28,11 +28,15 @@ sub enzDigest {
 }
 
 sub ORFpredict { 
-   use ProNTo::ORFprediction ();
+   use ProNTo::ORFprediction();
 }
 
 sub ionStat {
     use ProNTo::IonStats ();
+}
+
+sub helpText {
+    return "Hello";
 }
 
 sub main {

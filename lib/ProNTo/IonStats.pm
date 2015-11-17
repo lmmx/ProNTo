@@ -23,11 +23,12 @@ my ($binwidth,
     $data,
     $AAfilterContains,
     $AAfilterTerm,
-    @sortedmzvals
+    @sortedmzvals,
+    $usage
     );
 
 BEGIN {
-        $data =  "mztable.tsv";
+        $data =  "../../data/mztable.tsv";
         $AAfilterContains = "None";
         $AAfilterTerm = "None";
         $binwidth = 10;
@@ -54,12 +55,13 @@ sub handleopts {
                 "aa-filter-contains=s" => \$AAfilterContains,
                 "aa-filter-term=s" => \$AAfilterTerm)){
                 print "Help_page\n"; # to be replaced by generic help subroutine
-                die "Error, failed to obtain information from user\n";
+                $usage = "Error, failed to obtain sufficient arguments to calculate ion statistics.";
+                die $usage;
         }
 }
 
 sub reader {
-        open(IFILE, "../../data/$data") or die "Error, could not open input file\n";
+        open(IFILE, "$data") or die "Error, could not open input file\n";
 
         # READING THE DATA
         
