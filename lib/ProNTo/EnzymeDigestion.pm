@@ -6,7 +6,7 @@ package ProNTo::enzymeDigestion;
 #######################################################################################
 
 use strict;
-#use diagnostics;
+use diagnostics;
 use warnings;
 use Getopt::Long;
 
@@ -22,7 +22,7 @@ if (!GetOptions ("trypsin" => \$trypsin,
 	    "lys-c" => \$lysc,
 	    "arg-c" => \$argc,
 	    "glu-c" => \$gluc,
-	    "missed-cleavages=i" => $n_missed_cleavages,
+	    "missed-cleavages=i" => \$n_missed_cleavages,
 	    "help" => \$help_opt )) {
 	    	error_out("No arguments recognized");
 	    }
@@ -30,7 +30,7 @@ if (!GetOptions ("trypsin" => \$trypsin,
 
 # Declaring arrays and variables used.
 my (@sequences, @peptides, @mc_peptides, @sequences_ref);                       
-my ($protein, $sequence, $peptide, $unusual_counter,$unknown_counter, $protein_size, $peptide_size, $mc_peptide_size, $peptides_ref);
+my ($protein, $sequence, $peptide, $unusual_counter,$unknown_counter, $peptides_ref);
 my ($n,$r,$s,$i,$j);
 
 # Array of proteins for testing the program, should be silenced with a hash when using the proteins from task 1.
@@ -65,12 +65,7 @@ sub main {
 	# array with new peptides formed with $n misscleavages, where $n goes from 1 to the 
 	# max allowed cleavages. I.e: if $n_missed_cleavages=3, should return array of peptides
 	# with $n=1,2 and 3 misscleavages.
-	if ($n_missed_cleavages > 0) {@mc_peptides=missed_cleavages(\@peptides);}  
-	# Getting the lenght of the arrays containing the proteins, the peptides and the 
-	# misscleavage peptides in order to use them in the subroutine to print results.	
-	$protein_size=scalar(@sequences);
-	$peptide_size=scalar(@peptides);
-	$mc_peptide_size=scalar(@mc_peptides);
+	if ($n_missed_cleavages > 0) {@mc_peptides=missed_cleavages(\@peptides,\@sequences,$n_missed_cleavages);}  
 	# Goes to subroutine for printing the peptides obtained in the digestion.			
 	print_peptides(\@sequences,\@peptides,\@mc_peptides,\$n);     
 	# Exits the program.
@@ -122,12 +117,13 @@ sub digestion {
 sub missed_cleavages {
 	my $peptide_ref= shift;
 	my $sequence_ref=shift;
-	my @peptides_ref={@$peptides_ref};
-	my @sequences_ref={@sequences_ref};
-	my @n_cleav = (1...$n_missed_cleavages);
+	my $missed_cleavages_ref=shift;
+	my @sequences_ref=@{$sequence_ref};
+	my @peptides_ref=@{$peptide_ref};
+	my @n_cleav = (1...$missed_cleavages_ref);
 
-	for my $n (@n_cleav) {
-		for my $seq (0...@sequences_ref) {
+	for my $k(0...$#sequences_ref){
+		for my $n (@n_cleav) {
 			for my $pep (0...@peptides_ref-1) {
 				my $end_pep = $pep + $n;
 				my $mc_pep;
@@ -141,7 +137,8 @@ sub missed_cleavages {
 			}
 		}
 	}
-	print "This are my mc_peps @mc_peptides\n";
+
+#	print "This are my mc_peps @mc_peptides\n";
 	return @mc_peptides;
 	return @n_cleav;
 }
