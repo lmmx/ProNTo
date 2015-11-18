@@ -154,13 +154,12 @@ sub generateBins {
         my $binmin = $massmin;
         my $bin_number = ($massmax - $massmin)/$binwidth;
         my $bin = int ($MZ - $massmin)/$binwidth;
-        foreach my $MZ (@MZvalues)
+        foreach my $MZ (@MZvalues) {
                 # start loop with $binmin = $massmin and $binmax = $massmin + $binwidth
                 if ($MZ > $massmin and $MZ <= $massmax and $MZ <= $bin) {
                 # continue with $binmin = $massmin + binwidth and $binmax = $massmin + 2*$binwidth 
                 }
         }
-
 }
 # End of module evaluates to true
 
