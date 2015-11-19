@@ -64,11 +64,11 @@ sub readPepFASTA{
 sub processSeqLine {
 	my $currentline = shift;
 	chomp $currentline;
-	if ( /^>/ ) {
+	if ( /\^>/ ) {
 		# add the header line in FASTA file to the table for each peptide
 		my @first_column = substr((split(/|/,$currentline)),1);
 		printf ("%-11s \t %-11s %-11s \t", @first_column);	  # and knocks off the >
-	} elsif ( /^A-Z/ ) {
+	} elsif ( /\^A..Z*/ ) {
 		# Obtain m/z values
 		my $mz = MZconverter($currentline);
 		my @seqdata = ($currentline, $mz, $z);
