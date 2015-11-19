@@ -34,7 +34,7 @@ my ($protein, $sequence, $peptide, $unusual_counter,$unknown_counter, $peptides_
 my ($n,$r,$s,$i,$j);
 
 # Array of proteins for testing the program, should be silenced with a hash when using the proteins from task 1.
-my @proteins=qw(DAAAAATTLTTTAMTTTTTTCKMMFRPPPPPGGGGGGGGGGGG ALTAMCMNVWEITYHKGSDVNRRASFAQPPPQPPPPLLAIKPASDASD);
+#my @proteins=qw(DAAAAATTLTTTAMTTTTTTCKMMFRPPPPPGGGGGGGGGGGG ALTAMCMNVWEITYHKGSDVNRRASFAQPPPQPPPPLLAIKPASDASD);
 
 ############################################################################
 ##############           Main subroutine                          ##########
