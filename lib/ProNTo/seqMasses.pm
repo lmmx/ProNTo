@@ -16,8 +16,9 @@ my ($z,
 	$mass_type
     );
 BEGIN {
-        # set defaults for variables set in the GetOptions here, e.g.
-#		$pep_data = "../../data/dummy.peps";
+        $z = 1
+        $pep_data = 
+        $mass_type = "m"
 };
 
 __PACKAGE__->main(@ARGV) unless caller;
@@ -45,8 +46,8 @@ sub handleOpts {
 
 sub readPepFASTA{
 
-	@header = ("Protein", "Peptide Number", "Sequence", "m/z", "z", "Missed Cleavages");
-	printf ("%-11s \t %-11s \t %-s \t %-8s \t %s \t %s \n", @header);
+	@header = ("Protein", "Peptide Number", "Missed Cleavages", "Sequence", "m/z", "z");
+	printf ("%-11s \t %-11s \t %-s \t %-s \t %-8s \t %s \n", @header);
 	#The above two lines print the headers of each column for the table in correct format
 	
 	open(SEQFILE,$pep_data) or die "Unable to open file $pep_data\n";
@@ -65,13 +66,13 @@ sub processSeqLine {
 	chomp $currentline;
 	if ( /^>/ ) {
 		# add the header line in FASTA file to the table for each peptide
-		my @first_column = substr((split(/\w/,$currentline)),1);
-		printf ("%-11s \t %-11s \t", @first_column);	  # and knocks off the >
+		my @first_column = substr((split(/|/,$currentline)),1);
+		printf ("%-11s \t %-11s %-11s \t", @first_column);	  # and knocks off the >
 	} elsif ( /^A-Z/ ) {
 		# Obtain m/z values
 		my $mz = MZconverter($currentline);
 		my @seqdata = ($currentline, $mz, $z);
-		printf ("%-s \t %-8s \t %s \t %s \n", @seqdata);
+		printf ("%-s \t %-8s \t %s \n", @seqdata);
 	} else {
 		die "$pep_data in wrong format";
 	} 
