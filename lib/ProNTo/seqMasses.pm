@@ -16,9 +16,9 @@ my ($z,
 	$mass_type
     );
 BEGIN {
-        $z = 1
-        $pep_data = 
-        $mass_type = "m"
+        $z = 1;
+        $pep_data = $ARGV[0];
+        $mass_type = "m";
 };
 
 __PACKAGE__->main(@ARGV) unless caller;
@@ -46,7 +46,7 @@ sub handleOpts {
 
 sub readPepFASTA{
 
-	@header = ("Protein", "Peptide Number", "Missed Cleavages", "Sequence", "m/z", "z");
+	my @header = ("Protein", "Peptide Number", "Missed Cleavages", "Sequence", "m/z", "z");
 	printf ("%-11s \t %-11s \t %-s \t %-s \t %-8s \t %s \n", @header);
 	#The above two lines print the headers of each column for the table in correct format
 	
@@ -64,11 +64,11 @@ sub readPepFASTA{
 sub processSeqLine {
 	my $currentline = shift;
 	chomp $currentline;
-	if ( /^>/ ) {
+	if ( /\^>/ ) {
 		# add the header line in FASTA file to the table for each peptide
 		my @first_column = substr((split(/|/,$currentline)),1);
 		printf ("%-11s \t %-11s %-11s \t", @first_column);	  # and knocks off the >
-	} elsif ( /^A-Z/ ) {
+	} elsif ( /\^A..Z*/ ) {
 		# Obtain m/z values
 		my $mz = MZconverter($currentline);
 		my @seqdata = ($currentline, $mz, $z);
@@ -119,7 +119,7 @@ sub MZconverter {
 	my $water_mass = massWater($mass_type);
 	my @residues = split(//,$currentline); 			   #splits sequence data into parts
 	my @residue_masses = map { $mass_ref{$_} } @residues; 	   #uses hashes to find masses
-	$total_residue_mass = join ("+", @residue_masses);
+	my $total_residue_mass = join ("+", @residue_masses);
 	return(($total_residue_mass + $water_mass)/$z);
 }
 
