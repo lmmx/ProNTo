@@ -52,7 +52,7 @@ sub readPepFASTA{
 	open(SEQFILE,$pep_data) or die "Unable to open file $pep_data\n";
 	
 	while ( <SEQFILE> ) {
-		&processSeqLine($_);
+		processSeqLine($_);
 	}
 	close SEQFILE or die "Unable to close file $pep_data\n";
 }
@@ -69,7 +69,7 @@ sub processSeqLine {
 		printf ("%-11s \t %-11s \t", @first_column);	  # and knocks off the >
 	} elsif ( /^A-Z/ ) {
 		# Obtain m/z values
-		my $mz = &MZconverter($currentline);
+		my $mz = MZconverter($currentline);
 		my @seqdata = ($currentline, $mz, $z);
 		printf ("%-s \t %-8s \t %s \t %s \n", @seqdata);
 	} else {
@@ -114,8 +114,8 @@ sub massTable {
 sub MZconverter {
 	# pass in current line as a parameter
 	my $currentline = shift;
-	my %mass_ref = &massTable($mass_type);
-	my $water_mass = &massWater($mass_type);
+	my %mass_ref = massTable($mass_type);
+	my $water_mass = massWater($mass_type);
 	my @residues = split(//,$currentline); 			   #splits sequence data into parts
 	my @residue_masses = map { $mass_ref{$_} } @residues; 	   #uses hashes to find masses
 	$total_residue_mass = join ("+", @residue_masses);
