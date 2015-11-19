@@ -1,0 +1,61 @@
+ProNTo								User Commands					ProNTo(1)
+
+Name
+	ProNTo::enzymeDigestion : Proteomics eNzymology Toolkit ::  Open Reading Frame prediction module
+
+DESCRIPTION
+	ProNTo: ProNTo guides selection of enzymes for proteomics tailored to the target organism's genome.
+
+	The ORF prediction module reads genome data (~3000 line FASTAs maximum for efficiency) and outputs
+	summary statistics for all 6 reading frames along with predicted ORFs to STDOUT in FASTA format.
+
+	The module may be used individually while the pipeline is under development, placed on your $PATH or
+	run locally on Unix file systems (tested on Linux Mint 17 / Ubuntu 14.04).
+
+    Usage:
+	./ORFprediction.pm --sequence-file ../../data/seq1_out.fasta --summary > example_output.fasta
+	
+	Segmented FASTA files are provided in the `/data/` directory at https://github.com/lmmx/ProNTo
+
+	STDOUT may be redirected to a file to store the output, and further flags are available:
+
+	--help
+		Module-wide help text where used with the ProNTo::Methods module rather than standalone
+
+	-V
+		Verbose output, noting the lines and ORF coordinates being recorded
+
+	--orf-list 1 2 3 4 5 6
+		One to (all) six space-separated reading frames to filter ORF predictions within
+
+	--use-longest-orf
+		Select only the longest ORF (total nucleotides) to filter ORF predictions within
+
+	--summary
+		Present a summary table (as shown for the segmented genome.fasta file in accompanying
+		report (and data/orf_preds.md file on file repository).
+
+	--min-orf INTEGER
+		Minimum ORF size (in nucleotide length), default setting 150 to filter ORF predictions
+
+	--debug
+		Provide additional information to the verbose option for closer analysis of ORF prediction
+
+	-t
+		Translation off (when provided, strings are FASTA formatted in output but not translated,
+		for observation of the source of equivalent predictions in the FASTA output)
+
+Developer notes
+
+	Written and maintained by Louis Maddox as part of the ProNTo pipeline exercise at the University of
+	Manchester, 2015. Copyright to the author under MIT license, other modules licensing unassociated.
+
+	The algorithm attempts to remain memory efficient by keeping track of all ORF start and end sites,
+	skipping any 'seen' for a given ORF as it loops around. The algorithm needs development, and to catch
+	errors it currently translates sequences before confirming as a potential ORF to avoid observed
+	behaviour leading to ORFs containing STOP codons internally. The putative ORFs are translated,
+	any stop codon interruptions are separated, and the ORF only used if it remains larger than the
+	minimum ORF size indicated by the user (default 150 nucleotides, or 50 codons - STOP inclusive).
+
+
+						November 2015
