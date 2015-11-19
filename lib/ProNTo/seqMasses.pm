@@ -46,7 +46,7 @@ sub handleOpts {
 
 sub readPepFASTA{
 
-	@header = ("Protein", "Peptide Number", "Missed Cleavages", "Sequence", "m/z", "z");
+	my @header = ("Protein", "Peptide Number", "Missed Cleavages", "Sequence", "m/z", "z");
 	printf ("%-11s \t %-11s \t %-s \t %-s \t %-8s \t %s \n", @header);
 	#The above two lines print the headers of each column for the table in correct format
 	
@@ -119,7 +119,7 @@ sub MZconverter {
 	my $water_mass = massWater($mass_type);
 	my @residues = split(//,$currentline); 			   #splits sequence data into parts
 	my @residue_masses = map { $mass_ref{$_} } @residues; 	   #uses hashes to find masses
-	$total_residue_mass = join ("+", @residue_masses);
+	my $total_residue_mass = join ("+", @residue_masses);
 	return(($total_residue_mass + $water_mass)/$z);
 }
 
