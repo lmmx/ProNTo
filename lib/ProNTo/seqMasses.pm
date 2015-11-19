@@ -16,8 +16,9 @@ my ($z,
 	$mass_type
     );
 BEGIN {
-        # set defaults for variables set in the GetOptions here, e.g.
-#		$pep_data = "../../data/dummy.peps";
+        $z = 1
+        $pep_data = 
+        $mass_type = "m"
 };
 
 __PACKAGE__->main(@ARGV) unless caller;
