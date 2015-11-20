@@ -17,35 +17,58 @@ my ($trypsin, $lysc, $argc, $gluc, $help_opt );
 
 # Setting missed cleavages to a default value of 0.  
 my $n_missed_cleavages = 0;
+# Declaring arrays and variables used.
+my (@sequences, @peptides, @mc_peptides, @sequences_ref);                       
+my ($protein, $sequence, $peptide, $unusual_counter,$unknown_counter, $peptides_ref);
+my ($n,$r,$s,$i,$j);
+my ($sequence_input, $input_fh, $FASTAheader, $processing, @proteins);
 
 if (!GetOptions ("trypsin" => \$trypsin,
 	    "lys-c" => \$lysc,
 	    "arg-c" => \$argc,
 	    "glu-c" => \$gluc,
 	    "missed-cleavages=i" => \$n_missed_cleavages,
+		"sequence-file=s" => \$sequence_input,
 	    "help" => \$help_opt )) {
 	    	error_out("No arguments recognized");
 	    }
 
+sub reader {
+	my $processing = '';
+    open $input_fh, "<", $sequence_input
+         or die ProNTo::Methods::help('BAD_SEQ_FILE');
+    while (my $line = <$input_fh>) {
+        # dot assignment operator would appear simpler, but Camel book says to prefer join
+        # http://docstore.mik.ua/orelly/perl2/prog/ch24_02.htm
+		if ($line =~ /^>\s*(.+)/) {
+			if ($processing ne '') {
+				push @proteins, $processing;
+			}
+			# $FASTAheader = "> " . $1;
+			# chomp($FASTAheader);
+			# return('header', $FASTAheader);
+		} else {
+			next if ($line =~ /^$/); # skip blank lines
+			chomp($line);
+			$processing = join('', $processing, $line);
+		}
+    }
+    close $input_fh or die "$sequence_input: close failed: !";
+    return;
+}
 
-# Declaring arrays and variables used.
-my (@sequences, @peptides, @mc_peptides, @sequences_ref);                       
-my ($protein, $sequence, $peptide, $unusual_counter,$unknown_counter, $peptides_ref);
-my ($n,$r,$s,$i,$j);
-
-# Array of proteins for testing the program, should be silenced with a hash when using the proteins from task 1.
-#my @proteins=qw(DAAAAATTLTTTAMTTTTTTCKMMFRPPPPPGGGGGGGGGGGG ALTAMCMNVWEITYHKGSDVNRRASFAQPPPQPPPPLLAIKPASDASD);
-
-############################################################################
-##############           Main subroutine                          ##########
-############################################################################
 sub main {  
 	# If user selects option --help, goes to that subroutine and prints usage. 
 	# Then exits the program 
 	if ($help_opt) {
 		help();
 		exit;
-	} 
+	}
+	reader(); # put proteins in @proteins
+
+	# Array of proteins for testing the program, should be silenced with a hash when using the proteins from task 1.
+	#my @proteins=qw(DAAAAATTLTTTAMTTTTTTCKMMFRPPPPPGGGGGGGGGGGG ALTAMCMNVWEITYHKGSDVNRRASFAQPPPQPPPPLLAIKPASDASD);
+
 	# Reading FASTA format 
 	for $protein (@proteins) { 
 		if ($protein !~ /^>/)   {     
@@ -75,7 +98,8 @@ sub main {
 ##### END of main sub #####
 
 # Subroutine for protein digestion, receives the protein array from the main sub and processes it with the selected enzyme
-sub digestion { 
+sub digestion {
+	print "Digesting...\n";
 	# First parameter is the reference of the sequences array
 	my $sequences_ref=shift;
 	# Declaring a new array for the peptides
@@ -83,7 +107,7 @@ sub digestion {
 	# Dereferencing the sequences array
 	my @sequences_ref= @{$sequences_ref};
 	for (@sequences_ref) {
-		
+		# print scalar @peptides . " peptides";		
 		# Checks user input and runs the matching pattern of the specified enzyme for digestion
 		# If pattern matches, ads an = sign and splits there to divide the protein in peptides.
 		# Then pushes peptide to peptide array.
@@ -164,6 +188,7 @@ sub missed_cleavages {
 				}
 				push @mc_peptides, $mc_pep;
 				# Printing the new peptides
+				print "test...\n";
 				print "> Protein: $printed_k|Peptide:$printed_pep| $n cleavages\n";
         			print "$mc_peptides[$pep]\n\n";
 			}
@@ -214,11 +239,14 @@ sub print_peptides {
 	# Follows same order than the printing of mc_peptides
 	for my $i (0..$#sequences_ref) {
 		my $printed_i = $i+1;
+#		print "Processing " . $printed_i . " of "  . $#sequences_ref . "\n";
     		my $sequence_ref = $sequences_ref[$i];
     		my $j;
     		print "\t". scalar @peptides_ref . " peptides for protein $printed_i\n";
     			for my $j (0..$#peptides_ref) {
         			my $printed_j = $j+1;
+#							print "Processing " . $printed_j . " of "  . $#peptides_ref . "\n";
+
         			print "> Protein: $printed_i|Peptide:$printed_j| No cleavages\n";
         			print "$peptides_ref[$j]\n\n";
     			}
