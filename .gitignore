@@ -3,3 +3,5 @@ digester.pl
 seq*.fasta
 .Rproj.user
 *.Rproj
+*.swp
+*.swo

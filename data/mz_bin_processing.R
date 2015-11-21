@@ -50,3 +50,35 @@ for (i in 1:length(enzymes)) {
   processEnzTables(enzymes[i])
   #print(enzymes[i])
 }
+
+for (i in 1:length(enzymes)) {
+  enzyme.name <- enzymes[i]
+  enz.table <- get(paste0(enzyme.name, '.table'))
+  enz.seq.vector <- enz.table[6][,]
+  mean_seq_length <- mean(nchar(as.character(enz.seq.vector)))
+  print(paste0("Average sequence length for ", enzyme.name, " : ", mean_seq_length))
+}
+
+library(ggplot2)
+
+max.seqlength <- 50
+seqlengths <- nchar(as.character(arg_c.table[6][,]))
+arg_c_lengths <- data.frame(length = seqlengths[seqlengths < max.seqlength])
+seqlengths <- nchar(as.character(glu_c.table[6][,]))
+glu_c_lengths <- data.frame(length = seqlengths[seqlengths < max.seqlength])
+seqlengths <- nchar(as.character(lys_c.table[6][,]))
+lys_c_lengths <- data.frame(length = seqlengths[seqlengths < max.seqlength])
+seqlengths <- nchar(as.character(trypsin.table[6][,]))
+trypsin_lengths <- data.frame(length = seqlengths[seqlengths < max.seqlength])
+arg_c_lengths$enzyme <- 'arg_c'
+glu_c_lengths$enzyme <- 'glu_c'
+lys_c_lengths$enzyme <- 'lys_c'
+trypsin_lengths$enzyme <- 'trypsin'
+
+enz.lengths <- rbind(arg_c_lengths, glu_c_lengths, lys_c_lengths, trypsin_lengths)
+ggplot(enz.lengths, aes(length, fill = enzyme)) + geom_density(alpha = 0.2) +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank())
