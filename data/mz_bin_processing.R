@@ -76,8 +76,10 @@ lys_c_lengths$enzyme <- 'lys_c'
 trypsin_lengths$enzyme <- 'trypsin'
 
 enz.lengths <- rbind(arg_c_lengths, glu_c_lengths, lys_c_lengths, trypsin_lengths)
-ggplot(enz.lengths, aes(length, fill = enzyme)) + geom_density(alpha = 0.2) +
-  theme(axis.line = element_line(colour = "black"),
+
+ggplot(enz.lengths, aes(x=length)) + geom_density(aes(group=enzyme, colour=enzyme, fill = enzyme), alpha = 0.15) + 
+  xlab("Peptide length") + ylab("Density") +
+  theme(axis.line = element_line(colour = "grey"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
