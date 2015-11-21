@@ -1,3 +1,5 @@
 enzDigest_and_seqMasses.pl
 digester.pl
 seq*.fasta
+.Rproj.user
+*.Rproj
